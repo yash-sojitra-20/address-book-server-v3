@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS `user_logs` (
+    `id` BINARY(16) PRIMARY KEY,
+    `user_id` BINARY(16) NOT NULL,
+    `event` VARCHAR(100) NOT NULL,
+    `status` TINYINT NOT NULL DEFAULT 1,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES users (`id`) ON DELETE CASCADE
+);
