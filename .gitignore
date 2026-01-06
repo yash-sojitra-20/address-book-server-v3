@@ -1,0 +1,23 @@
+# Binaries
+bin/
+*.exe
+*.out
+
+# Go build files
+*.test
+
+# Environment files
+.env
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# CSV Export files
+/exports
