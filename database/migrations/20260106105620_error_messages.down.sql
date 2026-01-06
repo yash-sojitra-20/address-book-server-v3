@@ -1,0 +1,7 @@
+SET
+    FOREIGN_KEY_CHECKS = 0;
+
+TRUNCATE TABLE error_messages;
+
+SET
+    FOREIGN_KEY_CHECKS = 1;
