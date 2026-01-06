@@ -1,4 +1,6 @@
-DB_URL=mysql://swaraj:swaraj%40123@tcp(localhost:3306)/addressbook_v3
+# Load .env file
+include .env
+export
 
 migrate-up:
 	migrate -path database/migrations -database "$(DB_URL)" up
