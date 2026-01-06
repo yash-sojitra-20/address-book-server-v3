@@ -8,6 +8,7 @@ const (
 	DB_USERNAME       = "DB_USERNAME"
 	DB_PASSWORD       = "DB_PASSWORD"
 	DB_NAME           = "DB_NAME"
+	DB_URL			  = "DB_URL"
 
 	SMTP_USER         = "SMTP_USER"
 	SMTP_PASS         = "SMTP_PASS"
