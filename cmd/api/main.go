@@ -15,8 +15,8 @@ func main() {
 	}
 
 	appConfig := config.NewAppConfig()
-	application.NewApplication(appConfig)
+	application := application.NewApplication(appConfig)
 
-	fmt.Println("done.")
+	fmt.Println("application:", application)
 
 }
