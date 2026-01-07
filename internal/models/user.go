@@ -4,11 +4,12 @@ import (
 	"address-book-server-v3/internal/common/types"
 	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type User struct {
-	Id []byte `gorm:"primaryKey;autoIncrement"`
+	Id types.UserId `gorm:"primaryKey;autoIncrement"`
 
 	Email    string `gorm:"type:varchar(255);uniqueIndex;not null"`
 	Password string `gorm:"type:varchar(255);not null"`
@@ -18,6 +19,11 @@ type User struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 
 	Addresses []Address `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
+}
+
+func (user *User) BeforeCreate(tx *gorm.DB) (err error) {
+	user.Id = types.UserId(uuid.New())
+	return
 }
 
 type RegisterRequest struct {
