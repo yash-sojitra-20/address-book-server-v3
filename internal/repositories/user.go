@@ -23,6 +23,12 @@ type userRepo struct {
 	*RepoContext
 }
 
+func NewUserRepo(ctx *RepoContext) UserRepo {
+	return &userRepo{
+		ctx,
+	}
+}
+
 func (repo *userRepo) Create(u *models.User) mo.Result[*user] {
 	if err := repo.db.Create(&u).Error; err != nil {
 		return mo.Err[*user](fault.DBError(err))
