@@ -10,7 +10,6 @@ require (
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
-	github.com/samber/lo v1.38.1
 	github.com/samber/mo v1.13.0
 	gorm.io/gorm v1.31.1
 )
@@ -40,6 +39,7 @@ require (
 	github.com/mudita33/gorm-ora v0.1.4 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
+	github.com/samber/lo v1.38.1 // indirect
 	github.com/sijms/go-ora/v2 v2.8.24 // indirect
 	github.com/thoas/go-funk v0.9.2 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
