@@ -5,6 +5,7 @@ import (
 	"address-book-server-v3/internal/models"
 
 	"github.com/google/uuid"
+	"github.com/samber/lo"
 	"github.com/samber/mo"
 	"gorm.io/gorm"
 )
@@ -24,11 +25,17 @@ type AddressRepo interface {
 	Update(address *address) mo.Result[*address]
 	Delete(address *address) mo.Result[*address]
 	FindAllForExport(fields []string, userID uuid.UUID) mo.Result[*[]anyStringMap]
-	FindFiltered(userId uuid.UUID, listAddressQuery *models.ListAddressQuery) mo.Result[*addressData]
+	FindFiltered(userId uuid.UUID, listAddressQuery *models.FilterAddrQuery) mo.Result[*addressData]
 }
 
 type addressRepo struct {
 	*RepoContext
+}
+
+func NewAddressRepo(ctx *RepoContext) *addressRepo {
+	return &addressRepo{
+		ctx,
+	}
 }
 
 func (repo *addressRepo) Create(a *address) mo.Result[*address] {
@@ -83,12 +90,12 @@ func (repo *addressRepo) Update(a *address) mo.Result[*address] {
 	return mo.Ok(a)
 }
 
-func (repo *addressRepo) Delete(a *address) mo.Result[*address] {
+func (repo *addressRepo) Delete(a *address) mo.Result[*string] {
 	if err := repo.db.Delete(a).Error; err != nil {
-		return mo.Err[*address](fault.DBError(err))
+		return mo.Err[*string](fault.DBError(err))
 	}
 
-	return mo.Ok(a)
+	return mo.Ok(lo.ToPtr("Address deleted successfully"))
 }
 
 func (repo *addressRepo) FindAllForExport(fields []string, userID uuid.UUID) mo.Result[*[]anyStringMap] {
@@ -101,7 +108,7 @@ func (repo *addressRepo) FindAllForExport(fields []string, userID uuid.UUID) mo.
 	return mo.Ok(&results)
 }
 
-func (repo *addressRepo) FindFiltered(userId uuid.UUID, listAddressQuery *models.ListAddressQuery) mo.Result[*addressData] {
+func (repo *addressRepo) FindFiltered(userId uuid.UUID, listAddressQuery *models.FilterAddrQuery) mo.Result[*addressData] {
 	offset := (listAddressQuery.Page - 1) * listAddressQuery.Limit
 
 	query := repo.db.Model(&address{}).Where("user_id = ?", userId[:])

@@ -16,6 +16,7 @@ type AppConfig struct {
 	*ServerConfig
 	*LoggerConfig
 	*JwtConfig
+	*SMTPConfig
 }
 
 func NewAppConfig() *AppConfig {
@@ -46,12 +47,18 @@ func NewAppConfig() *AppConfig {
 		log.Fatal("jwtConfig", getErr(err, errors.FaultBundle))
 	}
 
+	smtpConfig, err := newSMTPConfig().Get()
+	if err != nil {
+		log.Fatal("smtpConfig", getErr(err, errors.FaultBundle))
+	}
+
 	log.Println("Config build success")
 	return &AppConfig{
 		dbConfig,
 		serverConfig,
 		loggerConfig,
 		jwtConfig,
+		smtpConfig,
 	}
 }
 

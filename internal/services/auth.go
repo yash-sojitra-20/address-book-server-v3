@@ -104,6 +104,6 @@ func (cmd *loginUserCmd) Execute(c command.CmdContext) mo.Result[*string] {
 
 		return mo.Ok(token)
 	}
-
+	
 	return transaction.DoInTransaction(ctx.GetDb(), operation)
 }
