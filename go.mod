@@ -8,9 +8,12 @@ require (
 	bitbucket.org/vayana/walt-gorm.go v1.0.4
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-playground/validator v9.31.0+incompatible
+	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
+	github.com/samber/lo v1.38.1
 	github.com/samber/mo v1.13.0
+	golang.org/x/crypto v0.46.0
 	gorm.io/gorm v1.31.1
 )
 
@@ -39,7 +42,6 @@ require (
 	github.com/mudita33/gorm-ora v0.1.4 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
-	github.com/samber/lo v1.38.1 // indirect
 	github.com/sijms/go-ora/v2 v2.8.24 // indirect
 	github.com/thoas/go-funk v0.9.2 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
@@ -47,7 +49,6 @@ require (
 	go.uber.org/multierr v1.10.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/crypto v0.46.0 // indirect
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
 	golang.org/x/net v0.47.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect

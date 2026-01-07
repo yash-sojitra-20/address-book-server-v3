@@ -1,15 +1,16 @@
 package models
 
 import (
+	"address-book-server-v3/internal/common/types"
 	"time"
 
 	"gorm.io/gorm"
 )
 
 type Address struct {
-	ID uint64 `gorm:"primaryKey;autoIncrement"`
+	ID []byte `gorm:"primaryKey;autoIncrement"`
 
-	UserID uint64 `gorm:"index;not null"`
+	UserID []byte `gorm:"index;not null"`
 
 	FirstName string `gorm:"type:varchar(100);not null"`
 	LastName  string `gorm:"type:varchar(100)"`
@@ -60,7 +61,7 @@ type ExportAddressRequest struct {
 }
 
 type AddressResponse struct {
-	Id           uint64 `json:"id"`
+	Id           types.AddressId `json:"id"`
 	FirstName    string `json:"first_name"`
 	LastName     string `json:"last_name"`
 	Email        string `json:"email"`
