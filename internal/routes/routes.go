@@ -24,7 +24,7 @@ func AddRoutes(router *gin.Engine, application application.Application) {
 
 	v3.Use(utils.HandleMiddleware(application, middlewares.AuthMiddleware))
 
-	addressRoutes := v3.Group("/address")
+	addressRoutes := v3.Group("/addresses")
 	{
 		addressRoutes.POST("", utils.HandleRequest(application, controllers.CreateAddrRequestController, controllers. NewCreateAddrRequest))
 

@@ -9,7 +9,7 @@ import (
 )
 
 type User struct {
-	Id types.UserId `gorm:"primaryKey;autoIncrement"`
+	Id []byte `gorm:"type:binary(16);primaryKey;autoIncrement"`
 
 	Email    string `gorm:"type:varchar(255);uniqueIndex;not null"`
 	Password string `gorm:"type:varchar(255);not null"`
@@ -22,7 +22,8 @@ type User struct {
 }
 
 func (user *User) BeforeCreate(tx *gorm.DB) (err error) {
-	user.Id = types.UserId(uuid.New())
+	id := uuid.New()
+	user.Id = id[:]
 	return
 }
 
@@ -32,24 +33,24 @@ type RegisterRequest struct {
 
 type RegisterRequestBody struct {
 	Email    string `json:"email" validate:"required,strict_email"`
-	Password string `json:"password" validate:"required"`
+	Password string `json:"password" validate:"required,password"`
 }
 
 type RegisterResponse struct {
-	Id uuid.UUID
+	Id    types.UserId
 	Email string
 }
 
-func NewRegisterResponse(id uuid.UUID, email string) *RegisterResponse {
+func NewRegisterResponse(id types.UserId, email string) *RegisterResponse {
 	return &RegisterResponse{
-		Id: id,
+		Id:    id,
 		Email: email,
 	}
 }
 
 type LoginRequestBody struct {
 	Email    string `json:"email" validate:"required,strict_email"`
-	Password string `json:"password" validate:"required"`
+	Password string `json:"password" validate:"required,password"`
 }
 
 type LoginRequest struct {
@@ -77,8 +78,8 @@ func NewLoginCmdOutputData(token string) *LoginCmdOutputData {
 }
 
 type UserCmdOutputData struct {
-	Id       types.UserId
-	Email    string
+	Id    types.UserId
+	Email string
 }
 
 func (UserCmdOutputData) IsCmdOutput() {}
@@ -86,8 +87,10 @@ func (UserCmdOutputData) IsCmdOutput() {}
 func (LoginCmdOutputData) IsCmdOutput() {}
 
 func NewUserCmdOutputData(user *User) *UserCmdOutputData {
+	_id, _ := uuid.FromBytes(user.Id)
+
 	return &UserCmdOutputData{
-		Id: types.UserId(user.Id),
+		Id:    types.UserId(_id),
 		Email: user.Email,
 	}
 }

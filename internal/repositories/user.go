@@ -59,11 +59,11 @@ func (repo *userRepo) ExistsByEmail(email string) mo.Result[*bool] {
 		return mo.Err[*bool](fault.DBError(err))
 	}
 
-	if count <= 0 {
-		return mo.Err[*bool](fault.RecordNotFound(map[string]any{
-			"email": email,
-		}, nil))
-	}
+	// if count <= 0 {
+	// 	return mo.Err[*bool](fault.RecordNotFound(map[string]any{
+	// 		"email": email,
+	// 	}, nil))
+	// }
 
 	return mo.Ok(lo.ToPtr(count > 0))
 }

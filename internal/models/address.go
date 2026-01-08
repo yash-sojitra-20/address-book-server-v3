@@ -9,9 +9,9 @@ import (
 )
 
 type Address struct {
-	Id types.AddressId `gorm:"primaryKey;autoIncrement"`
+	Id []byte `gorm:"type:binary(16);primaryKey;autoIncrement"`
 
-	UserId types.UserId `gorm:"index;not null"`
+	UserId []byte `gorm:"type:binary(16);index;not null"`
 
 	FirstName string `gorm:"type:varchar(100);not null"`
 	LastName  string `gorm:"type:varchar(100)"`
@@ -31,7 +31,8 @@ type Address struct {
 }
 
 func (address *Address) BeforeCreate(tx *gorm.DB) (err error) {
-	address.Id = types.AddressId(uuid.New())
+	id := uuid.New()
+	address.Id = id[:]
 	return
 }
 

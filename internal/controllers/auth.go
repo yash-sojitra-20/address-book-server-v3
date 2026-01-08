@@ -1,13 +1,13 @@
 package controllers
 
 import (
+	// "address-book-server-v3/internal/common/types"
 	"address-book-server-v3/internal/common/utils"
 	"address-book-server-v3/internal/core/application"
 	"address-book-server-v3/internal/models"
 	"address-book-server-v3/internal/services"
 
 	"bitbucket.org/vayana/walt-go/command"
-	"github.com/google/uuid"
 	"github.com/samber/mo"
 )
 
@@ -36,7 +36,7 @@ func RegisterRequestController(application application.Application, reqCtx utils
 		return mo.Err[*models.RegisterResponse](err)
 	}
 
-	response := models.NewRegisterResponse(uuid.UUID(cmdOutput.Id), cmdOutput.Email)
+	response := models.NewRegisterResponse(cmdOutput.Id, cmdOutput.Email)
 
 	return mo.Ok(response)
 }

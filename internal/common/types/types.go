@@ -24,8 +24,8 @@ const (
 
 var SYSTEM_USER_ID uuid.UUID = uuid.MustParse("6a1f0001-19b2-11f0-87f7-1cc10cfb5018")
 
-type UserId uuid.UUID
+type UserId = uuid.UUID
 
-type AddressId uuid.UUID
+type AddressId = uuid.UUID
 
 type Ip string

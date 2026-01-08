@@ -44,7 +44,7 @@ func (cmd *CreateAddrCmd) Execute(c command.CmdContext) mo.Result[*models.Addres
 		repo := repositories.NewAddressRepo(repoCtx)
 
 		address := models.Address{
-			UserId:       cmd.userId,
+			UserId:       cmd.userId[:],
 			FirstName:    cmd.createAddressRequest.Body.FirstName,
 			LastName:     cmd.createAddressRequest.Body.LastName,
 			Email:        cmd.createAddressRequest.Body.Email,

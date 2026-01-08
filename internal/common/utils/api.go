@@ -104,7 +104,6 @@ func HandleRequest[RQ any, RS any](application application.Application, handler 
 					c.JSON(status, res)
 				} else {
 					responseData, _ := res.Get()
-					c.JSON(200, *responseData)
 					if responseData == nil {
 						c.JSON(200, map[string]any{
 							"data": nil,
