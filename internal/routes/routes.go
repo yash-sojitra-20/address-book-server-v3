@@ -4,6 +4,7 @@ import (
 	"address-book-server-v3/internal/common/utils"
 	"address-book-server-v3/internal/controllers"
 	"address-book-server-v3/internal/core/application"
+	"address-book-server-v3/internal/core/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,6 +21,8 @@ func AddRoutes(router *gin.Engine, application application.Application) {
 	}
 
 	// All Private Routes
+
+	v3.Use(utils.HandleMiddleware(application, middlewares.AuthMiddleware))
 
 	addressRoutes := v3.Group("/address")
 	{

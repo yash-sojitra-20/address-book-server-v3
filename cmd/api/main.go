@@ -3,9 +3,10 @@ package main
 import (
 	"address-book-server-v3/internal/core/application"
 	"address-book-server-v3/internal/core/config"
-	"fmt"
+	"address-book-server-v3/internal/server"
 	"log"
 
+	"bitbucket.org/vayana/walt-gin-gonic/utils"
 	"github.com/joho/godotenv"
 )
 
@@ -17,6 +18,7 @@ func main() {
 	appConfig := config.NewAppConfig()
 	application := application.NewApplication(appConfig)
 
-	fmt.Println("application:", application)
+	server := server.NewServer(application).AddRoutes().Start()
 
+	<-utils.WaitForTermination(server)
 }
