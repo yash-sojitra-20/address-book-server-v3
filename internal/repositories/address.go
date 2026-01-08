@@ -117,26 +117,26 @@ func (repo *addressRepo) FindFiltered(userId uuid.UUID, listAddressQuery *models
 	if listAddressQuery.Body.Search != "" {
 		like := "%" + listAddressQuery.Body.Search + "%"
 		query = query.Where(`
-			first_name ILIKE ? OR 
-			last_name ILIKE ? OR 
-			email ILIKE ? OR
-			phone ILIKE ? OR
-			city ILIKE ? OR
-			state ILIKE ? OR
-			country ILIKE ?`,
+			first_name LIKE ? OR 
+			last_name LIKE ? OR 
+			email LIKE ? OR
+			phone LIKE ? OR
+			city LIKE ? OR
+			state LIKE ? OR
+			country LIKE ?`,
 			like, like, like, like, like, like, like,
 		)
 	}
 
 	// FILTERS
 	if listAddressQuery.Body.City != "" {
-		query = query.Where("city ILIKE ?", listAddressQuery.Body.City)
+		query = query.Where("city LIKE ?", listAddressQuery.Body.City)
 	}
 	if listAddressQuery.Body.State != "" {
-		query = query.Where("state ILIKE ?", listAddressQuery.Body.State)
+		query = query.Where("state LIKE ?", listAddressQuery.Body.State)
 	}
 	if listAddressQuery.Body.Country != "" {
-		query = query.Where("country ILIKE ?", listAddressQuery.Body.Country)
+		query = query.Where("country LIKE ?", listAddressQuery.Body.Country)
 	}
 
 	// fmt.Println(query)

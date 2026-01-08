@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	// "fmt"
 	"strings"
 
 	"address-book-server-v3/internal/common/fault"
@@ -37,11 +38,15 @@ func AuthMiddleware(application application.Application, c *gin.Context) mo.Resu
 	}
 
 	claims := token.Claims.(jwt.MapClaims)
-	userID := uint64(claims["user_id"].(float64))
+	// fmt.Println("===============> Auth Md : ==================> user_id: *Before String conv: ", claims["user_id"])
+	userID := string(claims["user_id"].(string))
+	// fmt.Println("===============> Auth Md : ==================> user_id: *After String conv: ", userID)
+	// fmt.Println("===============> Auth Md : ==================> user_email: *Before String conv: ", claims["user_email"])
 	userEmail := string(claims["user_email"].(string))
+	// fmt.Println("===============> Auth Md : ==================> user_email: *After String conv: ", userEmail)
 
-	c.Set("user_id", userID)
-	c.Set("user_email", userEmail)
+	c.Set("user_id", &userID)
+	c.Set("user_email", &userEmail)
 
 	validToken := true
 	return mo.Ok(&validToken)

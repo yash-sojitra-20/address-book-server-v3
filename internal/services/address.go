@@ -179,7 +179,10 @@ func (cmd *UpdateAddrCmd) Execute(c command.CmdContext) mo.Result[*models.Addres
 			address.AddressLine2 = *cmd.updateAddressRequest.Body.AddressLine2
 		}
 		if cmd.updateAddressRequest.Body.City != nil {
+			// fmt.Println("=====================> came in baroda.... *cmd.updateAddressRequest.Body.City", *cmd.updateAddressRequest.Body.City)
+			// fmt.Println("=====================> Before : address.City: ", address.City)
 			address.City = *cmd.updateAddressRequest.Body.City
+			// fmt.Println("=====================> After: address.City: ", address.City)
 		}
 		if cmd.updateAddressRequest.Body.State != nil {
 			address.State = *cmd.updateAddressRequest.Body.State

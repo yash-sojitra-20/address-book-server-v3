@@ -1,11 +1,15 @@
 package controllers
 
 import (
+	"address-book-server-v3/internal/common/fault"
 	"address-book-server-v3/internal/common/types"
 	"address-book-server-v3/internal/common/utils"
 	"address-book-server-v3/internal/core/application"
 	"address-book-server-v3/internal/models"
 	"address-book-server-v3/internal/services"
+	// "fmt"
+
+	// "fmt"
 
 	"bitbucket.org/vayana/walt-go/command"
 	"github.com/google/uuid"
@@ -29,8 +33,13 @@ func CreateAddrRequestController(application application.Application, reqCtx uti
 	logger := utils.NewApplicationBaseLogger(application.GetLogger(), reqCtx.GetIP())
 
 	cmdCtx := services.NewCommandContext(application, reqCtx, logger)
+
+	// fmt.Println("=========================================> cmdCtx.GetUserId() : ", cmdCtx.GetUserId())
+	_uuid, _ := uuid.Parse(*reqCtx.GetUserId())
+
+	// fmt.Println("=========================================> _uuid, cmdCtx.GetUserId() : ", _uuid, cmdCtx.GetUserId())
 	
-	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewCreateAddrCmd(*request, *cmdCtx.GetUserId())).Get()
+	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewCreateAddrCmd(*request, _uuid)).Get()
 	if err != nil {
 		logger.Error(utils.PrepareMsg(err, bundle))
 		return mo.Err[*models.AddressCmdOutputData](err)
@@ -40,12 +49,12 @@ func CreateAddrRequestController(application application.Application, reqCtx uti
 }
 
 func NewListAllAddrRequest(application application.Application, reqCtx utils.RequestCtx) mo.Result[*models.ListAllAddrRequest] {
-	_, err := utils.GetDataFromRequestBody[*models.ListAllAddrRequest](reqCtx.GetGinCtx()).Get()
+	req, err := utils.GetDataFromRequestBody[models.ListAllAddrRequest](reqCtx.GetGinCtx()).Get()
 
 	if err != nil {
 		return mo.Err[*models.ListAllAddrRequest](err)
 	}
-	return mo.Ok[*models.ListAllAddrRequest](nil)
+	return mo.Ok(req)
 }
 
 func ListAllAddrRequestController(application application.Application, reqCtx utils.RequestCtx, request *models.ListAllAddrRequest) mo.Result[*models.ListAddressCmdOutputData] {
@@ -53,8 +62,10 @@ func ListAllAddrRequestController(application application.Application, reqCtx ut
 	logger := utils.NewApplicationBaseLogger(application.GetLogger(), reqCtx.GetIP())
 
 	cmdCtx := services.NewCommandContext(application, reqCtx, logger)
-	
-	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewGetAllAddrCmd(*cmdCtx.GetUserId())).Get()
+
+	_uuid, _ := uuid.Parse(*cmdCtx.GetUserId())
+
+	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewGetAllAddrCmd(_uuid)).Get()
 	if err != nil {
 		logger.Error(utils.PrepareMsg(err, bundle))
 		return mo.Err[*models.ListAddressCmdOutputData](err)
@@ -66,7 +77,7 @@ func ListAllAddrRequestController(application application.Application, reqCtx ut
 func NewGetByIdRequest(application application.Application, reqCtx utils.RequestCtx) mo.Result[*models.GetByIdRequest] {
 	addrId, err := uuid.Parse(reqCtx.GetGinCtx().Param("id"))
 	if err != nil {
-		return mo.Err[*models.GetByIdRequest](err)
+		return mo.Err[*models.GetByIdRequest](fault.InvalidRequestError(err))
 	}
 	
 	return mo.Ok(&models.GetByIdRequest{
@@ -81,8 +92,15 @@ func GetByIdRequestController(application application.Application, reqCtx utils.
 	logger := utils.NewApplicationBaseLogger(application.GetLogger(), reqCtx.GetIP())
 
 	cmdCtx := services.NewCommandContext(application, reqCtx, logger)
+
+	_uuid, err := uuid.Parse(*cmdCtx.GetUserId())
+	// fmt.Println("========================> GetByIdRequestController(): ", _uuid)
+	if err != nil {
+		// fmt.Println("========================>Inside err of parse GetByIdRequestController(): ", err.Error())
+		return mo.Err[*models.AddressCmdOutputData](fault.InvalidRequestError(err))
+	}
 	
-	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewGetByIdAddrCmd(types.AddressId(request.Body.AddressId) ,*cmdCtx.GetUserId())).Get()
+	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewGetByIdAddrCmd(types.AddressId(request.Body.AddressId) ,_uuid)).Get()
 	if err != nil {
 		logger.Error(utils.PrepareMsg(err, bundle))
 		return mo.Err[*models.AddressCmdOutputData](err)
@@ -93,13 +111,14 @@ func GetByIdRequestController(application application.Application, reqCtx utils.
 
 func NewUpdateAddrRequest(application application.Application, reqCtx utils.RequestCtx) mo.Result[*models.UpdateAddressRequest] {
 	body, err := utils.GetDataFromRequestBody[models.UpdateAddressRequestBody](reqCtx.GetGinCtx()).Get()
+	// fmt.Println("=========================> NewUpdateAddrRequest() : body.City : ", body.City)
 	if err != nil {
 		return mo.Err[*models.UpdateAddressRequest](err)
 	}
 
 	addrId, err := uuid.Parse(reqCtx.GetGinCtx().Param("id"))
 	if err != nil {
-		return mo.Err[*models.UpdateAddressRequest](err)
+		return mo.Err[*models.UpdateAddressRequest](fault.InvalidRequestError(err))
 	}
 
 	return mo.Ok(&models.UpdateAddressRequest{
@@ -113,8 +132,9 @@ func UpdateAddrRequestController(application application.Application, reqCtx uti
 	logger := utils.NewApplicationBaseLogger(application.GetLogger(), reqCtx.GetIP())
 
 	cmdCtx := services.NewCommandContext(application, reqCtx, logger)
+	_uuid, _ := uuid.Parse(*cmdCtx.GetUserId())
 	
-	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewUpdateAddrCmd(request.AddressId, *cmdCtx.GetUserId(), *request)).Get()
+	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewUpdateAddrCmd(request.AddressId, _uuid, *request)).Get()
 	if err != nil {
 		logger.Error(utils.PrepareMsg(err, bundle))
 		return mo.Err[*models.AddressCmdOutputData](err)
@@ -126,7 +146,7 @@ func UpdateAddrRequestController(application application.Application, reqCtx uti
 func NewDeleteAddrRequest(application application.Application, reqCtx utils.RequestCtx) mo.Result[*models.DeleteRequest] {
 	addrId, err := uuid.Parse(reqCtx.GetGinCtx().Param("id"))
 	if err != nil {
-		return mo.Err[*models.DeleteRequest](err)
+		return mo.Err[*models.DeleteRequest](fault.InvalidRequestError(err))
 	}
 
 	return mo.Ok(&models.DeleteRequest{
@@ -141,8 +161,9 @@ func DeleteAddrRequestController(application application.Application, reqCtx uti
 	logger := utils.NewApplicationBaseLogger(application.GetLogger(), reqCtx.GetIP())
 
 	cmdCtx := services.NewCommandContext(application, reqCtx, logger)
+	_uuid, _ := uuid.Parse(*cmdCtx.GetUserId())
 	
-	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewDeleteAddrCmd(request.Body.AddressId, *cmdCtx.GetUserId())).Get()
+	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewDeleteAddrCmd(request.Body.AddressId, _uuid)).Get()
 	if err != nil {
 		logger.Error(utils.PrepareMsg(err, bundle))
 		return mo.Err[*models.DeleteCmdOutputData](err)
@@ -168,8 +189,9 @@ func ExportCustomAddrRequestController(application application.Application, reqC
 	logger := utils.NewApplicationBaseLogger(application.GetLogger(), reqCtx.GetIP())
 
 	cmdCtx := services.NewCommandContext(application, reqCtx, logger)
+	_uuid, _ := uuid.Parse(*cmdCtx.GetUserId())
 	
-	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewExportAsyncAddrCmd(*cmdCtx.GetUserId(), request.Body.Fields, request.Body.Email)).Get()
+	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewExportAsyncAddrCmd(_uuid, request.Body.Fields, request.Body.Email)).Get()
 	if err != nil {
 		logger.Error(utils.PrepareMsg(err, bundle))
 		return mo.Err[*models.ExportAsyncAddrCmdOutoutData](err)
@@ -195,8 +217,9 @@ func FilterAddrRequestController(application application.Application, reqCtx uti
 	logger := utils.NewApplicationBaseLogger(application.GetLogger(), reqCtx.GetIP())
 
 	cmdCtx := services.NewCommandContext(application, reqCtx, logger)
+	_uuid, _ := uuid.Parse(*cmdCtx.GetUserId())
 	
-	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewFilterAddrCmd(*request, *cmdCtx.GetUserId())).Get()
+	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewFilterAddrCmd(*request, _uuid)).Get()
 	if err != nil {
 		logger.Error(utils.PrepareMsg(err, bundle))
 		return mo.Err[*models.FilterAddrCmdOutputData](err)
