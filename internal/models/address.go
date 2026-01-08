@@ -192,3 +192,5 @@ func NewFilterAddrCmdOutputData(data []AddressCmdOutputData, total int64) *Filte
 }
 
 func (FilterAddrCmdOutputData) IsCmdOutput() {}
+
+type ListAllAddrRequest struct{}
