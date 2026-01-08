@@ -10,6 +10,9 @@ import (
 	"net/http"
 	"reflect"
 	"regexp"
+	"runtime"
+	"runtime/debug"
+
 	// "runtime"
 	// "runtime/debug"
 	"strings"
@@ -95,13 +98,13 @@ func HandleRequest[RQ any, RS any](application application.Application, handler 
 			case nil:
 				if res.IsError() {
 					err := res.Error().(wgf.Fault)
-					// logger.Error(PrepareMsg(err, bundle))
+					logger.Error(PrepareMsg(err, bundle))
 					status := getStatusCode(err.ResponseErrType())
 					res := getErrorResponse(err, bundle)
 					c.JSON(status, res)
 				} else {
 					responseData, _ := res.Get()
-					// c.JSON(200, *responseData)
+					c.JSON(200, *responseData)
 					if responseData == nil {
 						c.JSON(200, map[string]any{
 							"data": nil,
@@ -113,15 +116,17 @@ func HandleRequest[RQ any, RS any](application application.Application, handler 
 					}
 				}
 			default:
-				// f := fault.InternalServerError(fmt.Errorf("error %+v", exception))
-				// logger.Error(PrepareMsg(f, bundle))
-				// stack := debug.Stack()
-				// logger.Error(fmt.Sprintf("Stack trace for exception : %v \n %v", exception, string(stack)))
-				// if _, file, line, ok := runtime.Caller(1); ok {
-				// 	logger.Error(fmt.Sprintf("Recovered from panic in file %s at line %d: %v\n", file, line, exception))
-				// } else {
-				// 	logger.Error(fmt.Sprintln("Recovered from panic but couldn't retrieve file name and line number"))
-				// }
+				f := fault.InternalServerError(fmt.Errorf("error %+v", exception))
+				logger.Error(PrepareMsg(f, bundle))
+				stack := debug.Stack()
+				logger.Error(fmt.Sprintf("Stack trace for exception : %v \n %v", exception, string(stack)))
+				if _, file, line, ok := runtime.Caller(1); ok {
+					logger.Error(fmt.Sprintf("Recovered from panic in file %s at line %d: %v\n", file, line, exception))
+				} else {
+					logger.Error(fmt.Sprintln("Recovered from panic but couldn't retrieve file name and line number"))
+				}
+
+				// Send Email
 				// fullURL := c.Request.URL.String()
 				// host := c.Request.Host
 
@@ -131,7 +136,7 @@ func HandleRequest[RQ any, RS any](application application.Application, handler 
 				// 	logger.Error(fmt.Sprintf("Error sending email: %v", PrepareMsg(err, bundle)))
 				// }
 
-				// c.AbortWithStatusJSON(500, getErrorResponse(f, bundle))
+				c.AbortWithStatusJSON(500, getErrorResponse(f, bundle))
 			}
 		}()
 
@@ -230,7 +235,7 @@ func HandleMiddleware(application application.Application, middlewareHandler Api
 	return func(c *gin.Context) {
 		var res mo.Result[*bool]
 		bundle := application.GetBundle()
-		// logger := application.GetLogger()
+		logger := application.GetLogger()
 
 		defer func() {
 			switch exception := recover(); exception {
@@ -245,17 +250,17 @@ func HandleMiddleware(application application.Application, middlewareHandler Api
 					c.Next()
 				}
 			default:
-				// f := fault.InternalServerError(fmt.Errorf("error %+v", exception))
-				// logger.Error(PrepareMsg(f, bundle))
-				// stack := debug.Stack()
-				// formattedStack := strings.ReplaceAll(string(stack), "\n", "\n")
-				// formattedStack = strings.ReplaceAll(formattedStack, "\t", "\t")
-				// logger.Error(fmt.Sprintf("Stack trace for exception : %v \n %s\n", exception, formattedStack))
-				// if _, file, line, ok := runtime.Caller(1); ok {
-				// 	logger.Error(fmt.Sprintf("Recovered from panic in file %s at line %d: %v\n", file, line, exception))
-				// } else {
-				// 	logger.Error(fmt.Sprintln("Recovered from panic but couldn't retrieve file name and line number"))
-				// }
+				f := fault.InternalServerError(fmt.Errorf("error %+v", exception))
+				logger.Error(PrepareMsg(f, bundle))
+				stack := debug.Stack()
+				formattedStack := strings.ReplaceAll(string(stack), "\n", "\n")
+				formattedStack = strings.ReplaceAll(formattedStack, "\t", "\t")
+				logger.Error(fmt.Sprintf("Stack trace for exception : %v \n %s\n", exception, formattedStack))
+				if _, file, line, ok := runtime.Caller(1); ok {
+					logger.Error(fmt.Sprintf("Recovered from panic in file %s at line %d: %v\n", file, line, exception))
+				} else {
+					logger.Error(fmt.Sprintln("Recovered from panic but couldn't retrieve file name and line number"))
+				}
 
 				// // Send Email
 				// // emailRepo := repositories.NewEmailRepo(repositories.NewRepoContext(application.GetDb(), logger, bundle))
@@ -264,8 +269,8 @@ func HandleMiddleware(application application.Application, middlewareHandler Api
 				// // 	logger.Error(fmt.Sprintf("Error sending email: %v", PrepareMsg(f, bundle)))
 				// // }
 
-				// c.AbortWithStatusJSON(500, getErrorResponse(f, bundle))
-				// c.Request.Body.Close() // #nosec G104
+				c.AbortWithStatusJSON(500, getErrorResponse(f, bundle))
+				c.Request.Body.Close() // #nosec G104
 			}
 		}()
 		res = middlewareHandler(application, c)

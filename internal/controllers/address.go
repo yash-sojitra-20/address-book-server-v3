@@ -39,16 +39,16 @@ func CreateAddrRequestController(application application.Application, reqCtx uti
 	return mo.Ok(cmdOutput)
 }
 
-func NewListAllAddrRequest(application application.Application, reqCtx utils.RequestCtx) mo.Result[interface{}] {
-	_, err := utils.GetDataFromRequestBody[interface{}](reqCtx.GetGinCtx()).Get()
+func NewListAllAddrRequest(application application.Application, reqCtx utils.RequestCtx) mo.Result[*models.ListAllAddrRequest] {
+	_, err := utils.GetDataFromRequestBody[*models.ListAllAddrRequest](reqCtx.GetGinCtx()).Get()
 
 	if err != nil {
-		return mo.Err[interface{}](err)
+		return mo.Err[*models.ListAllAddrRequest](err)
 	}
-	return mo.Ok[any](nil)
+	return mo.Ok[*models.ListAllAddrRequest](nil)
 }
 
-func ListAllAddrRequestController(application application.Application, reqCtx utils.RequestCtx, request interface{}) mo.Result[*models.ListAddressCmdOutputData] {
+func ListAllAddrRequestController(application application.Application, reqCtx utils.RequestCtx, request *models.ListAllAddrRequest) mo.Result[*models.ListAddressCmdOutputData] {
 	bundle := application.GetBundle()
 	logger := utils.NewApplicationBaseLogger(application.GetLogger(), reqCtx.GetIP())
 
