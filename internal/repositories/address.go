@@ -109,13 +109,13 @@ func (repo *addressRepo) FindAllForExport(fields []string, userID uuid.UUID) mo.
 }
 
 func (repo *addressRepo) FindFiltered(userId uuid.UUID, listAddressQuery *models.FilterAddrQuery) mo.Result[*addressData] {
-	offset := (listAddressQuery.Page - 1) * listAddressQuery.Limit
+	offset := (listAddressQuery.Body.Page - 1) * listAddressQuery.Body.Limit
 
 	query := repo.db.Model(&address{}).Where("user_id = ?", userId[:])
 
 	// SEARCH (across multiple fields)
-	if listAddressQuery.Search != "" {
-		like := "%" + listAddressQuery.Search + "%"
+	if listAddressQuery.Body.Search != "" {
+		like := "%" + listAddressQuery.Body.Search + "%"
 		query = query.Where(`
 			first_name ILIKE ? OR 
 			last_name ILIKE ? OR 
@@ -129,14 +129,14 @@ func (repo *addressRepo) FindFiltered(userId uuid.UUID, listAddressQuery *models
 	}
 
 	// FILTERS
-	if listAddressQuery.City != "" {
-		query = query.Where("city ILIKE ?", listAddressQuery.City)
+	if listAddressQuery.Body.City != "" {
+		query = query.Where("city ILIKE ?", listAddressQuery.Body.City)
 	}
-	if listAddressQuery.State != "" {
-		query = query.Where("state ILIKE ?", listAddressQuery.State)
+	if listAddressQuery.Body.State != "" {
+		query = query.Where("state ILIKE ?", listAddressQuery.Body.State)
 	}
-	if listAddressQuery.Country != "" {
-		query = query.Where("country ILIKE ?", listAddressQuery.Country)
+	if listAddressQuery.Body.Country != "" {
+		query = query.Where("country ILIKE ?", listAddressQuery.Body.Country)
 	}
 
 	// fmt.Println(query)
@@ -148,7 +148,7 @@ func (repo *addressRepo) FindFiltered(userId uuid.UUID, listAddressQuery *models
 
 	// PAGINATION
 	var addresses []models.Address
-	if err := query.Limit(listAddressQuery.Limit).Offset(offset).Order("created_at DESC").Find(&addresses).Error; err != nil {
+	if err := query.Limit(listAddressQuery.Body.Limit).Offset(offset).Order("created_at DESC").Find(&addresses).Error; err != nil {
 		return mo.Err[*addressData](fault.DBError(err))
 	}
 

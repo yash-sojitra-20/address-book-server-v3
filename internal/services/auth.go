@@ -75,10 +75,10 @@ func NewLoginUserCmd(email string, password string) *loginUserCmd {
 	}
 }
 
-func (cmd *loginUserCmd) Execute(c command.CmdContext) mo.Result[*string] {
+func (cmd *loginUserCmd) Execute(c command.CmdContext) mo.Result[*models.LoginCmdOutputData] {
 	ctx := c.(CommandContext)
 
-	operation := func(db *gorm.DB) mo.Result[*string] {
+	operation := func(db *gorm.DB) mo.Result[*models.LoginCmdOutputData] {
 		logger := ctx.GetLogger()
 
 		repoCtx := repositories.NewRepoContext(db, logger)
@@ -86,12 +86,12 @@ func (cmd *loginUserCmd) Execute(c command.CmdContext) mo.Result[*string] {
 
 		user, err := repo.FindByEmail(cmd.email).Get()
 		if err != nil {
-			return mo.Err[*string](err)
+			return mo.Err[*models.LoginCmdOutputData](err)
 		}
 
 		isPassMatch, err := utils.ComparePassword(user.Password, cmd.password).Get()
 		if err != nil {
-			return mo.Err[*string](fault.InvalidPassword(nil))
+			return mo.Err[*models.LoginCmdOutputData](fault.InvalidPassword(nil))
 		}
 
 		var token *string
@@ -99,10 +99,10 @@ func (cmd *loginUserCmd) Execute(c command.CmdContext) mo.Result[*string] {
 			token, err = utils.GenerateToken(ctx.GetConfig().GetSecretKey(), uuid.UUID(user.Id), user.Email).Get()
 		}
 		if err != nil {
-			return mo.Err[*string](err)
+			return mo.Err[*models.LoginCmdOutputData](err)
 		}
-
-		return mo.Ok(token)
+		_token := models.NewLoginCmdOutputData(*token)
+		return mo.Ok(_token)
 	}
 	
 	return transaction.DoInTransaction(ctx.GetDb(), operation)
