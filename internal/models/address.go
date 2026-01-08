@@ -36,6 +36,10 @@ func (address *Address) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 type CreateAddressRequest struct {
+	Body *CreateAddressRequestBody
+}
+
+type CreateAddressRequestBody struct {
 	FirstName    string `json:"first_name" validate:"required"`
 	LastName     string `json:"last_name"`
 	Email        string `json:"email" validate:"required,strict_email"`
@@ -48,7 +52,20 @@ type CreateAddressRequest struct {
 	Pincode      string `json:"pincode" validate:"omitempty,pincode"`
 }
 
+type GetByIdRequest struct {
+	Body *GetByIdRequestBody
+}
+
+type GetByIdRequestBody struct {
+	AddressId types.AddressId
+}
+
 type UpdateAddressRequest struct {
+	AddressId types.AddressId
+	Body *UpdateAddressRequestBody
+}
+
+type UpdateAddressRequestBody struct {
 	FirstName    *string `json:"first_name"`
 	LastName     *string `json:"last_name"`
 	Email        *string `json:"email" validate:"omitempty,strict_email"`
@@ -93,6 +110,28 @@ func NewAddressCmdOutputData(address *Address) *AddressCmdOutputData {
 	}
 }
 
+func (AddressCmdOutputData) IsCmdOutput() {}
+
+type ListAddressCmdOutputData struct {
+	Addresses []AddressCmdOutputData
+}
+
+func NewListAddressCmdOutputData(addresses []AddressCmdOutputData) *ListAddressCmdOutputData {
+	return &ListAddressCmdOutputData{
+		Addresses: addresses,
+	}
+}
+
+func (ListAddressCmdOutputData) IsCmdOutput() {}
+
+type DeleteRequest struct {
+	Body *DeleteRequestBody
+}
+
+type DeleteRequestBody struct {
+	AddressId types.AddressId
+}
+
 type DeleteCmdOutputData struct {
 	Message string
 }
@@ -103,9 +142,15 @@ func NewDeleteCmdOutputData(message string) *DeleteCmdOutputData {
 	}
 }
 
-type ExportAddressRequest struct {
+func (DeleteCmdOutputData) IsCmdOutput() {}
+
+type ExportAddressRequestBody struct {
 	Fields []string `json:"fields" validate:"required,min=1"`
 	Email  string   `json:"email" validate:"required,strict_email"`
+}
+
+type ExportAddressRequest struct {
+	Body *ExportAddressRequestBody
 }
 
 type ExportAsyncAddrCmdOutoutData struct {
@@ -118,7 +163,9 @@ func NewExportAsyncAddrCmdOutputData(message string) *ExportAsyncAddrCmdOutoutDa
 	}
 }
 
-type FilterAddrQuery struct {
+func (ExportAsyncAddrCmdOutoutData) IsCmdOutput() {}
+
+type FilterAddrQueryBody struct {
 	Page    int    `form:"page"`
 	Limit   int    `form:"limit"`
 	Search  string `form:"search"`
@@ -126,6 +173,10 @@ type FilterAddrQuery struct {
 	State   string `form:"state"`
 	Country string `form:"country"`
 	Pincode string `form:"pincode"`
+}
+
+type FilterAddrQuery struct {
+	Body *FilterAddrQueryBody
 }
 
 type FilterAddrCmdOutputData struct {
@@ -139,3 +190,5 @@ func NewFilterAddrCmdOutputData(data []AddressCmdOutputData, total int64) *Filte
 		Total: total,
 	}
 }
+
+func (FilterAddrCmdOutputData) IsCmdOutput() {}

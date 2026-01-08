@@ -27,25 +27,67 @@ func (user *User) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 type RegisterRequest struct {
+	Body *RegisterRequestBody
+}
+
+type RegisterRequestBody struct {
+	Email    string `json:"email" validate:"required,strict_email"`
+	Password string `json:"password" validate:"required"`
+}
+
+type RegisterResponse struct {
+	Id uuid.UUID
+	Email string
+}
+
+func NewRegisterResponse(id uuid.UUID, email string) *RegisterResponse {
+	return &RegisterResponse{
+		Id: id,
+		Email: email,
+	}
+}
+
+type LoginRequestBody struct {
 	Email    string `json:"email" validate:"required,strict_email"`
 	Password string `json:"password" validate:"required"`
 }
 
 type LoginRequest struct {
-	Email    string `json:"email" validate:"required,strict_email"`
-	Password string `json:"password" validate:"required"`
+	Body *LoginRequestBody
+}
+
+type LoginResponse struct {
+	Token *string
+}
+
+func NewLoginResponse(token string) *LoginResponse {
+	return &LoginResponse{
+		Token: &token,
+	}
+}
+
+type LoginCmdOutputData struct {
+	Token *string
+}
+
+func NewLoginCmdOutputData(token string) *LoginCmdOutputData {
+	return &LoginCmdOutputData{
+		Token: &token,
+	}
 }
 
 type UserCmdOutputData struct {
 	Id       types.UserId
 	Email    string
-	Password string
 }
+
+func (UserCmdOutputData) IsCmdOutput() {}
+
+func (LoginCmdOutputData) IsCmdOutput() {}
 
 func NewUserCmdOutputData(user *User) *UserCmdOutputData {
 	return &UserCmdOutputData{
 		Id: types.UserId(user.Id),
 		Email: user.Email,
-		Password: user.Password,
 	}
 }

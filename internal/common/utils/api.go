@@ -27,12 +27,14 @@ type RequestCtx interface {
 	GetIP() types.Ip
 	GetGinCtx() *gin.Context
 	GetUserId() *types.UserId
+	GetEmail() *string
 }
 
 type _RequestCtx struct {
 	GinCtx *gin.Context
 	IP     types.Ip
 	UserId *types.UserId
+	Email *string
 }
 
 func NewRequestCtx(
@@ -40,10 +42,12 @@ func NewRequestCtx(
 ) RequestCtx {
 	ip := ginCtx.ClientIP()
 	userId, _ := GetUserId(ginCtx).Get()
+	email, _ := GetEmail(ginCtx).Get()
 	return &_RequestCtx{
 		GinCtx: ginCtx,
 		IP:     types.Ip(ip),
 		UserId: userId,
+		Email: email,
 	}
 }
 
@@ -54,8 +58,13 @@ func (r *_RequestCtx) GetIP() types.Ip {
 func (r *_RequestCtx) GetGinCtx() *gin.Context {
 	return r.GinCtx
 }
+
 func (r *_RequestCtx) GetUserId() *types.UserId {
 	return r.UserId
+}
+
+func (r *_RequestCtx) GetEmail() *string {
+	return r.Email
 }
 
 type RequestPayload[R any] func(application.Application, RequestCtx) mo.Result[*R]
@@ -335,4 +344,14 @@ func GetUserId(c *gin.Context) mo.Result[*types.UserId] {
 		return mo.Err[*types.UserId](fault.GetUserIdError("userId", err))
 	}
 	return userIdResult
+}
+
+
+func GetEmail(c *gin.Context) mo.Result[*string] {
+	email := request.GetValueFromGinContext[string](c, "email")
+	if email.IsError() {
+		err := email.Error()
+		return mo.Err[*string](fault.GetUserIdError("email", err))
+	}
+	return email
 }

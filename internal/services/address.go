@@ -45,16 +45,16 @@ func (cmd *CreateAddrCmd) Execute(c command.CmdContext) mo.Result[*models.Addres
 
 		address := models.Address{
 			UserId:       cmd.userId,
-			FirstName:    cmd.createAddressRequest.FirstName,
-			LastName:     cmd.createAddressRequest.LastName,
-			Email:        cmd.createAddressRequest.Email,
-			Phone:        cmd.createAddressRequest.Phone,
-			AddressLine1: cmd.createAddressRequest.AddressLine1,
-			AddressLine2: cmd.createAddressRequest.AddressLine2,
-			City:         cmd.createAddressRequest.City,
-			State:        cmd.createAddressRequest.State,
-			Country:      cmd.createAddressRequest.Country,
-			Pincode:      cmd.createAddressRequest.Pincode,
+			FirstName:    cmd.createAddressRequest.Body.FirstName,
+			LastName:     cmd.createAddressRequest.Body.LastName,
+			Email:        cmd.createAddressRequest.Body.Email,
+			Phone:        cmd.createAddressRequest.Body.Phone,
+			AddressLine1: cmd.createAddressRequest.Body.AddressLine1,
+			AddressLine2: cmd.createAddressRequest.Body.AddressLine2,
+			City:         cmd.createAddressRequest.Body.City,
+			State:        cmd.createAddressRequest.Body.State,
+			Country:      cmd.createAddressRequest.Body.Country,
+			Pincode:      cmd.createAddressRequest.Body.Pincode,
 		}
 
 		addr, err := repo.Create(&address).Get()
@@ -78,10 +78,10 @@ func NewGetAllAddrCmd(userId types.UserId) *GetAllAddrCmd {
 	return &GetAllAddrCmd{userId: userId}
 }
 
-func (cmd *GetAllAddrCmd) Execute(c command.CmdContext) mo.Result[*[]models.AddressCmdOutputData] {
+func (cmd *GetAllAddrCmd) Execute(c command.CmdContext) mo.Result[*models.ListAddressCmdOutputData] {
 	ctx := c.(CommandContext)
 
-	operation := func(db *gorm.DB) mo.Result[*[]models.AddressCmdOutputData] {
+	operation := func(db *gorm.DB) mo.Result[*models.ListAddressCmdOutputData] {
 		logger := ctx.GetLogger()
 
 		repoCtx := repositories.NewRepoContext(db, logger)
@@ -89,7 +89,7 @@ func (cmd *GetAllAddrCmd) Execute(c command.CmdContext) mo.Result[*[]models.Addr
 
 		addresses, err := repo.FindByUser(uuid.UUID(cmd.userId)).Get()
 		if err != nil {
-			return mo.Err[*[]models.AddressCmdOutputData](err)
+			return mo.Err[*models.ListAddressCmdOutputData](err)
 		}
 
 		var _addresses []models.AddressCmdOutputData
@@ -97,7 +97,9 @@ func (cmd *GetAllAddrCmd) Execute(c command.CmdContext) mo.Result[*[]models.Addr
 			_addresses = append(_addresses, *models.NewAddressCmdOutputData(&v))
 		}
 
-		return mo.Ok(&_addresses)
+		_addrs := models.NewListAddressCmdOutputData(_addresses)
+
+		return mo.Ok(_addrs)
 	}
 
 	return transaction.DoInTransaction(ctx.GetDb(), operation)
@@ -158,35 +160,35 @@ func (cmd *UpdateAddrCmd) Execute(c command.CmdContext) mo.Result[*models.Addres
 			return mo.Err[*models.AddressCmdOutputData](err)
 		}
 
-		if cmd.updateAddressRequest.FirstName != nil {
-			address.FirstName = *cmd.updateAddressRequest.FirstName
+		if cmd.updateAddressRequest.Body.FirstName != nil {
+			address.FirstName = *cmd.updateAddressRequest.Body.FirstName
 		}
-		if cmd.updateAddressRequest.LastName != nil {
-			address.LastName = *cmd.updateAddressRequest.LastName
+		if cmd.updateAddressRequest.Body.LastName != nil {
+			address.LastName = *cmd.updateAddressRequest.Body.LastName
 		}
-		if cmd.updateAddressRequest.Email != nil {
-			address.Email = *cmd.updateAddressRequest.Email
+		if cmd.updateAddressRequest.Body.Email != nil {
+			address.Email = *cmd.updateAddressRequest.Body.Email
 		}
-		if cmd.updateAddressRequest.Phone != nil {
-			address.Phone = *cmd.updateAddressRequest.Phone
+		if cmd.updateAddressRequest.Body.Phone != nil {
+			address.Phone = *cmd.updateAddressRequest.Body.Phone
 		}
-		if cmd.updateAddressRequest.AddressLine1 != nil {
-			address.AddressLine1 = *cmd.updateAddressRequest.AddressLine1
+		if cmd.updateAddressRequest.Body.AddressLine1 != nil {
+			address.AddressLine1 = *cmd.updateAddressRequest.Body.AddressLine1
 		}
-		if cmd.updateAddressRequest.AddressLine2 != nil {
-			address.AddressLine2 = *cmd.updateAddressRequest.AddressLine2
+		if cmd.updateAddressRequest.Body.AddressLine2 != nil {
+			address.AddressLine2 = *cmd.updateAddressRequest.Body.AddressLine2
 		}
-		if cmd.updateAddressRequest.City != nil {
-			address.City = *cmd.updateAddressRequest.City
+		if cmd.updateAddressRequest.Body.City != nil {
+			address.City = *cmd.updateAddressRequest.Body.City
 		}
-		if cmd.updateAddressRequest.State != nil {
-			address.State = *cmd.updateAddressRequest.State
+		if cmd.updateAddressRequest.Body.State != nil {
+			address.State = *cmd.updateAddressRequest.Body.State
 		}
-		if cmd.updateAddressRequest.Country != nil {
-			address.Country = *cmd.updateAddressRequest.Country
+		if cmd.updateAddressRequest.Body.Country != nil {
+			address.Country = *cmd.updateAddressRequest.Body.Country
 		}
-		if cmd.updateAddressRequest.Pincode != nil {
-			address.Pincode = *cmd.updateAddressRequest.Pincode
+		if cmd.updateAddressRequest.Body.Pincode != nil {
+			address.Pincode = *cmd.updateAddressRequest.Body.Pincode
 		}
 
 		address, err = repo.Update(address).Get()
@@ -343,11 +345,11 @@ func (cmd *FilterAddrCmd) Execute(c command.CmdContext) mo.Result[*models.Filter
 		repoCtx := repositories.NewRepoContext(db, logger)
 		repo := repositories.NewAddressRepo(repoCtx)
 
-		if cmd.filterAddrQuery.Page <= 0 {
-			cmd.filterAddrQuery.Page = 1
+		if cmd.filterAddrQuery.Body.Page <= 0 {
+			cmd.filterAddrQuery.Body.Page = 1
 		}
-		if cmd.filterAddrQuery.Limit <= 0 {
-			cmd.filterAddrQuery.Limit = 10
+		if cmd.filterAddrQuery.Body.Limit <= 0 {
+			cmd.filterAddrQuery.Body.Limit = 10
 		}
 
 		result, err := repo.FindFiltered(uuid.UUID(cmd.userId), &cmd.filterAddrQuery).Get()
