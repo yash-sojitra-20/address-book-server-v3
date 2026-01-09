@@ -63,7 +63,7 @@ type GetByIdRequestBody struct {
 
 type UpdateAddressRequest struct {
 	AddressId types.AddressId
-	Body *UpdateAddressRequestBody
+	Body      *UpdateAddressRequestBody
 }
 
 type UpdateAddressRequestBody struct {
@@ -94,6 +94,38 @@ type AddressCmdOutputData struct {
 	Pincode      string
 }
 
+type AddressResponse struct {
+	Id           string `json:"id"`
+	UserId       string `json:"user_id"`
+	FirstName    string `json:"first_name"`
+	LastName     string `json:"last_name"`
+	Email        string `json:"email" validate:"omitempty,strict_email"`
+	Phone        string `json:"phone" validate:"omitempty,phone"`
+	AddressLine1 string `json:"address_line1"`
+	AddressLine2 string `json:"address_line2"`
+	City         string `json:"city"`
+	State        string `json:"state"`
+	Country      string `json:"country"`
+	Pincode      string `json:"pincode" validate:"omitempty,pincode"`
+}
+
+func NewAddressResponse(addressCmdOutputData *AddressCmdOutputData) *AddressResponse {
+	return &AddressResponse{
+		Id:           addressCmdOutputData.Id.String(),
+		UserId:       addressCmdOutputData.UserId.String(),
+		FirstName:    addressCmdOutputData.FirstName,
+		LastName:     addressCmdOutputData.LastName,
+		Email:        addressCmdOutputData.Email,
+		Phone:        addressCmdOutputData.Phone,
+		AddressLine1: addressCmdOutputData.AddressLine1,
+		AddressLine2: addressCmdOutputData.AddressLine2,
+		City:         addressCmdOutputData.City,
+		State:        addressCmdOutputData.State,
+		Country:      addressCmdOutputData.Country,
+		Pincode:      addressCmdOutputData.Pincode,
+	}
+}
+
 func NewAddressCmdOutputData(address *Address) *AddressCmdOutputData {
 	return &AddressCmdOutputData{
 		Id:           types.AddressId(address.Id),
@@ -113,6 +145,8 @@ func NewAddressCmdOutputData(address *Address) *AddressCmdOutputData {
 
 func (AddressCmdOutputData) IsCmdOutput() {}
 
+type ListAllAddrRequest struct{}
+
 type ListAddressCmdOutputData struct {
 	Addresses []AddressCmdOutputData
 }
@@ -122,13 +156,21 @@ func NewListAddressCmdOutputData(addresses []AddressCmdOutputData) *ListAddressC
 		Addresses: addresses,
 	}
 }
-
 func (ListAddressCmdOutputData) IsCmdOutput() {}
+
+type ListAddressResponse struct {
+	Addresses []AddressResponse `json:"addresses"`
+}
+
+func NewListAddressResponse(addresses []AddressResponse) *ListAddressResponse {
+	return &ListAddressResponse{
+		Addresses: addresses,
+	}
+}
 
 type DeleteRequest struct {
 	Body *DeleteRequestBody
 }
-
 type DeleteRequestBody struct {
 	AddressId types.AddressId
 }
@@ -142,8 +184,17 @@ func NewDeleteCmdOutputData(message string) *DeleteCmdOutputData {
 		Message: message,
 	}
 }
-
 func (DeleteCmdOutputData) IsCmdOutput() {}
+
+type DeleteResponse struct {
+	Message string
+}
+
+func NewDeleteResponse(deleteCmdOutputData *DeleteCmdOutputData) *DeleteResponse {
+	return &DeleteResponse{
+		Message: deleteCmdOutputData.Message,
+	}
+}
 
 type ExportAddressRequestBody struct {
 	Fields []string `json:"fields" validate:"required,min=1"`
@@ -163,8 +214,17 @@ func NewExportAsyncAddrCmdOutputData(message string) *ExportAsyncAddrCmdOutoutDa
 		Message: message,
 	}
 }
-
 func (ExportAsyncAddrCmdOutoutData) IsCmdOutput() {}
+
+type ExportAsyncAddrResponse struct {
+	Message string
+}
+
+func NewExportAsyncAddrResponse(exportAsyncAddrCmdOutoutData *ExportAsyncAddrCmdOutoutData) *ExportAsyncAddrResponse {
+	return &ExportAsyncAddrResponse{
+		Message: exportAsyncAddrCmdOutoutData.Message,
+	}
+}
 
 type FilterAddrQueryBody struct {
 	Page    int    `form:"page"`
@@ -187,11 +247,19 @@ type FilterAddrCmdOutputData struct {
 
 func NewFilterAddrCmdOutputData(data []AddressCmdOutputData, total int64) *FilterAddrCmdOutputData {
 	return &FilterAddrCmdOutputData{
-		Data: data,
+		Data:  data,
 		Total: total,
 	}
 }
-
 func (FilterAddrCmdOutputData) IsCmdOutput() {}
 
-type ListAllAddrRequest struct{}
+type FilterAddrResponse struct {
+	Data  *ListAddressResponse `json:"data"`
+	Total int64                `json:"total"`
+}
+func NewFilterAddrResponse(listAddressResponse *ListAddressResponse, total int64) *FilterAddrResponse {
+	return &FilterAddrResponse{
+		Data: listAddressResponse,
+		Total: total,
+	}
+}

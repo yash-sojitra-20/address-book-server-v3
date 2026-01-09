@@ -28,7 +28,7 @@ func NewCreateAddrRequest(application application.Application, reqCtx utils.Requ
 	})
 }
 
-func CreateAddrRequestController(application application.Application, reqCtx utils.RequestCtx, request *models.CreateAddressRequest) mo.Result[*models.AddressCmdOutputData] {
+func CreateAddrRequestController(application application.Application, reqCtx utils.RequestCtx, request *models.CreateAddressRequest) mo.Result[*models.AddressResponse] {
 	bundle := application.GetBundle()
 	logger := utils.NewApplicationBaseLogger(application.GetLogger(), reqCtx.GetIP())
 
@@ -42,10 +42,12 @@ func CreateAddrRequestController(application application.Application, reqCtx uti
 	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewCreateAddrCmd(*request, _uuid)).Get()
 	if err != nil {
 		logger.Error(utils.PrepareMsg(err, bundle))
-		return mo.Err[*models.AddressCmdOutputData](err)
+		return mo.Err[*models.AddressResponse](err)
 	}
 
-	return mo.Ok(cmdOutput)
+	response := models.NewAddressResponse(cmdOutput)
+
+	return mo.Ok(response)
 }
 
 func NewListAllAddrRequest(application application.Application, reqCtx utils.RequestCtx) mo.Result[*models.ListAllAddrRequest] {
@@ -54,10 +56,11 @@ func NewListAllAddrRequest(application application.Application, reqCtx utils.Req
 	if err != nil {
 		return mo.Err[*models.ListAllAddrRequest](err)
 	}
+
 	return mo.Ok(req)
 }
 
-func ListAllAddrRequestController(application application.Application, reqCtx utils.RequestCtx, request *models.ListAllAddrRequest) mo.Result[*models.ListAddressCmdOutputData] {
+func ListAllAddrRequestController(application application.Application, reqCtx utils.RequestCtx, request *models.ListAllAddrRequest) mo.Result[*models.ListAddressResponse] {
 	bundle := application.GetBundle()
 	logger := utils.NewApplicationBaseLogger(application.GetLogger(), reqCtx.GetIP())
 
@@ -68,10 +71,17 @@ func ListAllAddrRequestController(application application.Application, reqCtx ut
 	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewGetAllAddrCmd(_uuid)).Get()
 	if err != nil {
 		logger.Error(utils.PrepareMsg(err, bundle))
-		return mo.Err[*models.ListAddressCmdOutputData](err)
+		return mo.Err[*models.ListAddressResponse](err)
 	}
 
-	return mo.Ok(cmdOutput)
+	var listAddr []models.AddressResponse
+	for _, addr := range(cmdOutput.Addresses) {
+		listAddr = append(listAddr, *models.NewAddressResponse(&addr))
+	}
+
+	response := models.NewListAddressResponse(listAddr)
+
+	return mo.Ok(response)
 }
 
 func NewGetByIdRequest(application application.Application, reqCtx utils.RequestCtx) mo.Result[*models.GetByIdRequest] {
@@ -87,7 +97,7 @@ func NewGetByIdRequest(application application.Application, reqCtx utils.Request
 	})
 }
 
-func GetByIdRequestController(application application.Application, reqCtx utils.RequestCtx, request *models.GetByIdRequest) mo.Result[*models.AddressCmdOutputData] {
+func GetByIdRequestController(application application.Application, reqCtx utils.RequestCtx, request *models.GetByIdRequest) mo.Result[*models.AddressResponse] {
 	bundle := application.GetBundle()
 	logger := utils.NewApplicationBaseLogger(application.GetLogger(), reqCtx.GetIP())
 
@@ -97,16 +107,18 @@ func GetByIdRequestController(application application.Application, reqCtx utils.
 	// fmt.Println("========================> GetByIdRequestController(): ", _uuid)
 	if err != nil {
 		// fmt.Println("========================>Inside err of parse GetByIdRequestController(): ", err.Error())
-		return mo.Err[*models.AddressCmdOutputData](fault.InvalidRequestError(err))
+		return mo.Err[*models.AddressResponse](fault.InvalidRequestError(err))
 	}
 	
 	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewGetByIdAddrCmd(types.AddressId(request.Body.AddressId) ,_uuid)).Get()
 	if err != nil {
 		logger.Error(utils.PrepareMsg(err, bundle))
-		return mo.Err[*models.AddressCmdOutputData](err)
+		return mo.Err[*models.AddressResponse](err)
 	}
 
-	return mo.Ok(cmdOutput)
+	response := models.NewAddressResponse(cmdOutput)
+
+	return mo.Ok(response)
 }
 
 func NewUpdateAddrRequest(application application.Application, reqCtx utils.RequestCtx) mo.Result[*models.UpdateAddressRequest] {
@@ -127,7 +139,7 @@ func NewUpdateAddrRequest(application application.Application, reqCtx utils.Requ
 	})
 }
 
-func UpdateAddrRequestController(application application.Application, reqCtx utils.RequestCtx, request *models.UpdateAddressRequest) mo.Result[*models.AddressCmdOutputData] {
+func UpdateAddrRequestController(application application.Application, reqCtx utils.RequestCtx, request *models.UpdateAddressRequest) mo.Result[*models.AddressResponse] {
 	bundle := application.GetBundle()
 	logger := utils.NewApplicationBaseLogger(application.GetLogger(), reqCtx.GetIP())
 
@@ -137,10 +149,12 @@ func UpdateAddrRequestController(application application.Application, reqCtx uti
 	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewUpdateAddrCmd(request.AddressId, _uuid, *request)).Get()
 	if err != nil {
 		logger.Error(utils.PrepareMsg(err, bundle))
-		return mo.Err[*models.AddressCmdOutputData](err)
+		return mo.Err[*models.AddressResponse](err)
 	}
 
-	return mo.Ok(cmdOutput)
+	response := models.NewAddressResponse(cmdOutput)
+
+	return mo.Ok(response)
 }
 
 func NewDeleteAddrRequest(application application.Application, reqCtx utils.RequestCtx) mo.Result[*models.DeleteRequest] {
@@ -156,7 +170,7 @@ func NewDeleteAddrRequest(application application.Application, reqCtx utils.Requ
 	})
 }
 
-func DeleteAddrRequestController(application application.Application, reqCtx utils.RequestCtx, request *models.DeleteRequest) mo.Result[*models.DeleteCmdOutputData] {
+func DeleteAddrRequestController(application application.Application, reqCtx utils.RequestCtx, request *models.DeleteRequest) mo.Result[*models.DeleteResponse] {
 	bundle := application.GetBundle()
 	logger := utils.NewApplicationBaseLogger(application.GetLogger(), reqCtx.GetIP())
 
@@ -166,10 +180,12 @@ func DeleteAddrRequestController(application application.Application, reqCtx uti
 	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewDeleteAddrCmd(request.Body.AddressId, _uuid)).Get()
 	if err != nil {
 		logger.Error(utils.PrepareMsg(err, bundle))
-		return mo.Err[*models.DeleteCmdOutputData](err)
+		return mo.Err[*models.DeleteResponse](err)
 	}
 
-	return mo.Ok(cmdOutput)
+	response := models.NewDeleteResponse(cmdOutput)
+
+	return mo.Ok(response)
 }
 
 func NewExportCustomAddrRequest(application application.Application, reqCtx utils.RequestCtx) mo.Result[*models.ExportAddressRequest] {
@@ -184,7 +200,7 @@ func NewExportCustomAddrRequest(application application.Application, reqCtx util
 	})
 }
 
-func ExportCustomAddrRequestController(application application.Application, reqCtx utils.RequestCtx, request *models.ExportAddressRequest) mo.Result[*models.ExportAsyncAddrCmdOutoutData] {
+func ExportCustomAddrRequestController(application application.Application, reqCtx utils.RequestCtx, request *models.ExportAddressRequest) mo.Result[*models.ExportAsyncAddrResponse] {
 	bundle := application.GetBundle()
 	logger := utils.NewApplicationBaseLogger(application.GetLogger(), reqCtx.GetIP())
 
@@ -194,10 +210,12 @@ func ExportCustomAddrRequestController(application application.Application, reqC
 	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewExportAsyncAddrCmd(_uuid, request.Body.Fields, request.Body.Email)).Get()
 	if err != nil {
 		logger.Error(utils.PrepareMsg(err, bundle))
-		return mo.Err[*models.ExportAsyncAddrCmdOutoutData](err)
+		return mo.Err[*models.ExportAsyncAddrResponse](err)
 	}
 
-	return mo.Ok(cmdOutput)
+	response := models.NewExportAsyncAddrResponse(cmdOutput)
+
+	return mo.Ok(response)
 }
 
 func NewFilterAddrRequest(application application.Application, reqCtx utils.RequestCtx) mo.Result[*models.FilterAddrQuery] {
@@ -212,7 +230,7 @@ func NewFilterAddrRequest(application application.Application, reqCtx utils.Requ
 	})
 }
 
-func FilterAddrRequestController(application application.Application, reqCtx utils.RequestCtx, request *models.FilterAddrQuery) mo.Result[*models.FilterAddrCmdOutputData] {
+func FilterAddrRequestController(application application.Application, reqCtx utils.RequestCtx, request *models.FilterAddrQuery) mo.Result[*models.FilterAddrResponse] {
 	bundle := application.GetBundle()
 	logger := utils.NewApplicationBaseLogger(application.GetLogger(), reqCtx.GetIP())
 
@@ -222,8 +240,18 @@ func FilterAddrRequestController(application application.Application, reqCtx uti
 	cmdOutput, err := command.ExecuteCommand(cmdCtx, services.NewFilterAddrCmd(*request, _uuid)).Get()
 	if err != nil {
 		logger.Error(utils.PrepareMsg(err, bundle))
-		return mo.Err[*models.FilterAddrCmdOutputData](err)
+		return mo.Err[*models.FilterAddrResponse](err)
 	}
 
-	return mo.Ok(cmdOutput)
+	var listAddr []models.AddressResponse
+
+	for _, addr := range(cmdOutput.Data) {
+		listAddr = append(listAddr, *models.NewAddressResponse(&addr))
+	}
+
+	data := models.NewListAddressResponse(listAddr)
+
+	response := models.NewFilterAddrResponse(data, cmdOutput.Total)
+
+	return mo.Ok(response)
 }
