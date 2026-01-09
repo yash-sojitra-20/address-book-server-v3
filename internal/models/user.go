@@ -37,13 +37,13 @@ type RegisterRequestBody struct {
 }
 
 type RegisterResponse struct {
-	Id    types.UserId
-	Email string
+	Id    string `json:"id"`
+	Email string `json:"email"`
 }
 
 func NewRegisterResponse(id types.UserId, email string) *RegisterResponse {
 	return &RegisterResponse{
-		Id:    id,
+		Id:    id.String(),
 		Email: email,
 	}
 }
@@ -58,19 +58,18 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Token *string
+	Token string `json:"token"`
 }
 
 func NewLoginResponse(token string) *LoginResponse {
 	return &LoginResponse{
-		Token: &token,
+		Token: token,
 	}
 }
 
 type LoginCmdOutputData struct {
 	Token *string
 }
-
 func NewLoginCmdOutputData(token string) *LoginCmdOutputData {
 	return &LoginCmdOutputData{
 		Token: &token,
