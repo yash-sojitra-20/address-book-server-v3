@@ -65,6 +65,14 @@ func NewApplication(appConfig *config.AppConfig) Application {
 	}
 }
 
+func NewApplicationForTesting(appConfig *config.AppConfig, testDB *gorm.DB) Application {
+	app := NewApplication(appConfig).(*application)
+	if testDB != nil {
+		app.db = testDB
+	}
+	return app
+}
+
 func (application *application) GetConfig() *config.AppConfig {
 	return application.config
 }

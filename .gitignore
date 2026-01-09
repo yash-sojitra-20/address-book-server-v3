@@ -7,7 +7,7 @@ bin/
 *.test
 
 # Environment files
-.env
+*.env
 
 # Logs
 *.log
