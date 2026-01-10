@@ -4,7 +4,7 @@ import (
 	"address-book-server-v3/internal/common/types"
 	"time"
 
-	"github.com/google/uuid"
+	// "github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -30,11 +30,11 @@ type Address struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
-func (address *Address) BeforeCreate(tx *gorm.DB) (err error) {
-	id := uuid.New()
-	address.Id = id[:]
-	return
-}
+// func (address *Address) BeforeCreate(tx *gorm.DB) (err error) {
+// 	id := uuid.New()
+// 	address.Id = id[:]
+// 	return
+// }
 
 type CreateAddressRequest struct {
 	Body *CreateAddressRequestBody

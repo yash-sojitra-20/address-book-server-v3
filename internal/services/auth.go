@@ -52,6 +52,8 @@ func (cmd *registerUserCmd) Execute(c command.CmdContext) mo.Result[*models.User
 			Email:    cmd.email,
 			Password: *hashedPass,
 		}
+		id := uuid.New()
+		user.Id = id[:]
 
 		createdUser, err := userRepo.Create(user).Get()
 		if err != nil {
@@ -104,6 +106,6 @@ func (cmd *loginUserCmd) Execute(c command.CmdContext) mo.Result[*models.LoginCm
 		_token := models.NewLoginCmdOutputData(*token)
 		return mo.Ok(_token)
 	}
-	
+
 	return transaction.DoInTransaction(ctx.GetDb(), operation)
 }

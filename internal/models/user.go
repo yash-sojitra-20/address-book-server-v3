@@ -21,11 +21,11 @@ type User struct {
 	Addresses []Address `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 }
 
-func (user *User) BeforeCreate(tx *gorm.DB) (err error) {
-	id := uuid.New()
-	user.Id = id[:]
-	return
-}
+// func (user *User) BeforeCreate(tx *gorm.DB) (err error) {
+// 	id := uuid.New()
+// 	user.Id = id[:]
+// 	return
+// }
 
 type RegisterRequest struct {
 	Body *RegisterRequestBody

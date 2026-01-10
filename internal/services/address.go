@@ -56,6 +56,8 @@ func (cmd *CreateAddrCmd) Execute(c command.CmdContext) mo.Result[*models.Addres
 			Country:      cmd.createAddressRequest.Body.Country,
 			Pincode:      cmd.createAddressRequest.Body.Pincode,
 		}
+		id := uuid.New()
+		address.Id = id[:]
 
 		addr, err := repo.Create(&address).Get()
 		if err != nil {
@@ -331,7 +333,7 @@ func (cmd *ExportAsyncAddrCmd) Execute(c command.CmdContext) mo.Result[*models.E
 }
 
 type FilterAddrCmd struct {
-	userId types.UserId
+	userId          types.UserId
 	filterAddrQuery models.FilterAddrQuery
 }
 
