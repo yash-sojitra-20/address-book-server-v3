@@ -10,6 +10,7 @@ import (
 	wgconfig "bitbucket.org/vayana/walt-gorm.go/config"
 	wgormconfig "bitbucket.org/vayana/walt-gorm.go/config"
 	sql "github.com/golang-migrate/migrate/v4/database/mysql"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/gorm"
