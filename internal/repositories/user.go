@@ -3,6 +3,7 @@ package repositories
 import (
 	"address-book-server-v3/internal/common/fault"
 	"address-book-server-v3/internal/models"
+	// "fmt"
 
 	"github.com/google/uuid"
 	"github.com/samber/lo"
@@ -75,11 +76,11 @@ func (repo *userRepo) ExistsByID(userID uuid.UUID) mo.Result[*bool] {
 		return mo.Err[*bool](fault.DBError(err))
 	}
 
-	if count <= 0 {
-		return mo.Err[*bool](fault.RecordNotFound(map[string]any{
-			"user_id": userID,
-		}, nil))
-	}
+	// if count <= 0 {
+	// 	return mo.Err[*bool](fault.RecordNotFound(map[string]any{
+	// 		"user_id": userID,
+	// 	}, nil))
+	// }
 
 	return mo.Ok(lo.ToPtr(count > 0))
 }
