@@ -45,8 +45,12 @@ func AuthMiddleware(application application.Application, c *gin.Context) mo.Resu
 	userEmail := string(claims["user_email"].(string))
 	// fmt.Println("===============> Auth Md : ==================> user_email: *After String conv: ", userEmail)
 
-	c.Set("user_id", &userID)
-	c.Set("user_email", &userEmail)
+	// must pass pointer in : bitbucket.org/vayana/walt-gin-gonic v1.0.1 or older
+	// c.Set("user_id", &userID)
+
+	// can pass pointer or value in : bitbucket.org/vayana/walt-gin-gonic v1.0.2
+	c.Set("user_id", userID)
+	c.Set("user_email", userEmail)
 
 	validToken := true
 	return mo.Ok(&validToken)

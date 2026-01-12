@@ -3,7 +3,7 @@ module address-book-server-v3
 go 1.25.5
 
 require (
-	bitbucket.org/vayana/walt-gin-gonic v1.0.1
+	bitbucket.org/vayana/walt-gin-gonic v1.0.2
 	bitbucket.org/vayana/walt-go v1.0.3
 	bitbucket.org/vayana/walt-gorm.go v1.0.4
 	github.com/gin-gonic/gin v1.9.1
