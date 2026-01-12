@@ -20,4 +20,4 @@ bin/
 .idea/
 
 # CSV Export files
-/exports
+**/export/**
