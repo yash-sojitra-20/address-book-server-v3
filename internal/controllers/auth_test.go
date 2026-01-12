@@ -15,7 +15,7 @@ func (s *ControllerTestSuite) TestRegisterUser() {
 	s.Run("it registers a user", func() {
 		user := models.RegisterRequest{
 			Body: &models.RegisterRequestBody{
-				Email:    "yash1@gmail.com",
+				Email:    "yash11@gmail.com",
 				Password: "Password@123",
 			},
 		}
@@ -38,19 +38,19 @@ func (s *ControllerTestSuite) TestRegisterUser() {
 		}
 
 		json.Unmarshal(w.Body.Bytes(), &response)
-		s.Equal("yash1@gmail.com", response.Data.Email)
+		s.Equal("yash11@gmail.com", response.Data.Email)
 	})
 }
 
 func (s *ControllerTestSuite) TestLoginUser() {
 	s.Run("it logins a user", func() {
 
-		cmd := services.NewRegisterUserCmd("yash1@gmail.com", "Password@123")
+		cmd := services.NewRegisterUserCmd("yash12@gmail.com", "Password@123")
 		cmd.Execute(services.NewCommandContext(s.app, services.NewMockRequestCtx(), s.app.GetLogger()))
 
 		user := models.LoginRequest{
 			Body: &models.LoginRequestBody{
-				Email:    "yash1@gmail.com",
+				Email:    "yash12@gmail.com",
 				Password: "Password@123",
 			},
 		}
@@ -76,7 +76,7 @@ func (s *ControllerTestSuite) TestLoginUser() {
 		// fmt.Println("============> test2")
 		user2 := models.LoginRequest{
 			Body: &models.LoginRequestBody{
-				Email:    "yash2@gmail.com",
+				Email:    "yash12@gmil.com",
 				Password: "Password@123",
 			},
 		}

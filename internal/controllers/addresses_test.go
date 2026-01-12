@@ -47,7 +47,7 @@ func authRequest(method, url, token string, body []byte) *http.Request {
 
 func (s *ControllerTestSuite) TestCreateAddress() {
 	s.Run("creates address", func() {
-		token := s.loginAndGetToken("create@addr.com")
+		// token := s.loginAndGetToken("create@addr.com")
 
 		reqBody := models.CreateAddressRequestBody{
 			FirstName:    "John",
@@ -62,7 +62,7 @@ func (s *ControllerTestSuite) TestCreateAddress() {
 		}
 
 		body, _ := json.Marshal(reqBody)
-		req := authRequest(http.MethodPost, "/api/v3/addresses", token, body)
+		req := authRequest(http.MethodPost, "/api/v3/addresses", s.token, body)
 		w := httptest.NewRecorder()
 
 		s.router.ServeHTTP(w, req)
@@ -81,7 +81,7 @@ func (s *ControllerTestSuite) TestCreateAddress() {
 
 func (s *ControllerTestSuite) TestListAllAddresses() {
 	s.Run("lists addresses", func() {
-		token := s.loginAndGetToken("list@addr.com")
+		// token := s.loginAndGetToken("list@addr.com")
 
 		createBody := models.CreateAddressRequestBody{
 			FirstName:    "A",
@@ -92,10 +92,10 @@ func (s *ControllerTestSuite) TestListAllAddresses() {
 
 		s.router.ServeHTTP(
 			httptest.NewRecorder(),
-			authRequest(http.MethodPost, "/api/v3/addresses", token, body),
+			authRequest(http.MethodPost, "/api/v3/addresses", s.token, body),
 		)
 
-		req := authRequest(http.MethodGet, "/api/v3/addresses", token, nil)
+		req := authRequest(http.MethodGet, "/api/v3/addresses", s.token, nil)
 		w := httptest.NewRecorder()
 
 		s.router.ServeHTTP(w, req)
@@ -107,13 +107,13 @@ func (s *ControllerTestSuite) TestListAllAddresses() {
 		}
 		json.Unmarshal(w.Body.Bytes(), &resp)
 
-		s.Len(resp.Data.Addresses, 1)
+		s.Len(resp.Data.Addresses, 3)
 	})
 }
 
 func (s *ControllerTestSuite) TestGetAddressById() {
 	s.Run("gets address by id", func() {
-		token := s.loginAndGetToken("get@addr.com")
+		// token := s.loginAndGetToken("get@addr.com")
 
 		createBody := models.CreateAddressRequestBody{
 			FirstName:    "Fetch",
@@ -124,7 +124,7 @@ func (s *ControllerTestSuite) TestGetAddressById() {
 
 		w1 := httptest.NewRecorder()
 		s.router.ServeHTTP(w1,
-			authRequest(http.MethodPost, "/api/v3/addresses", token, body),
+			authRequest(http.MethodPost, "/api/v3/addresses", s.token, body),
 		)
 
 		var createResp struct {
@@ -135,7 +135,7 @@ func (s *ControllerTestSuite) TestGetAddressById() {
 		req := authRequest(
 			http.MethodGet,
 			"/api/v3/addresses/"+createResp.Data.Id,
-			token,
+			s.token,
 			nil,
 		)
 
@@ -147,7 +147,7 @@ func (s *ControllerTestSuite) TestGetAddressById() {
 		req = authRequest(
 			http.MethodGet,
 			"/api/v3/addresses/123",
-			token,
+			s.token,
 			nil,
 		)
 		w = httptest.NewRecorder()
@@ -159,7 +159,7 @@ func (s *ControllerTestSuite) TestGetAddressById() {
 
 func (s *ControllerTestSuite) TestUpdateAddress() {
 	s.Run("updates address", func() {
-		token := s.loginAndGetToken("update@addr.com")
+		// token := s.loginAndGetToken("update@addr.com")
 
 		createBody := models.CreateAddressRequestBody{
 			FirstName:    "Old",
@@ -170,7 +170,7 @@ func (s *ControllerTestSuite) TestUpdateAddress() {
 
 		w1 := httptest.NewRecorder()
 		s.router.ServeHTTP(w1,
-			authRequest(http.MethodPost, "/api/v3/addresses", token, body),
+			authRequest(http.MethodPost, "/api/v3/addresses", s.token, body),
 		)
 
 		var createResp struct {
@@ -187,7 +187,7 @@ func (s *ControllerTestSuite) TestUpdateAddress() {
 		req := authRequest(
 			http.MethodPut,
 			"/api/v3/addresses/"+createResp.Data.Id,
-			token,
+			s.token,
 			upd,
 		)
 
@@ -200,7 +200,7 @@ func (s *ControllerTestSuite) TestUpdateAddress() {
 
 func (s *ControllerTestSuite) TestDeleteAddress() {
 	s.Run("deletes address", func() {
-		token := s.loginAndGetToken("delete@addr.com")
+		// token := s.loginAndGetToken("delete@addr.com")
 
 		createBody := models.CreateAddressRequestBody{
 			FirstName:    "Del",
@@ -211,7 +211,7 @@ func (s *ControllerTestSuite) TestDeleteAddress() {
 
 		w1 := httptest.NewRecorder()
 		s.router.ServeHTTP(w1,
-			authRequest(http.MethodPost, "/api/v3/addresses", token, body),
+			authRequest(http.MethodPost, "/api/v3/addresses", s.token, body),
 		)
 
 		var createResp struct {
@@ -222,7 +222,7 @@ func (s *ControllerTestSuite) TestDeleteAddress() {
 		req := authRequest(
 			http.MethodDelete,
 			"/api/v3/addresses/"+createResp.Data.Id,
-			token,
+			s.token,
 			nil,
 		)
 
@@ -235,7 +235,7 @@ func (s *ControllerTestSuite) TestDeleteAddress() {
 
 func (s *ControllerTestSuite) TestExportAddresses() {
 	s.Run("exports addresses", func() {
-		token := s.loginAndGetToken("export@addr.com")
+		// token := s.loginAndGetToken("export@addr.com")
 
 		reqBody := models.ExportAddressRequestBody{
 			Fields: []string{"first_name", "email"},
@@ -243,7 +243,7 @@ func (s *ControllerTestSuite) TestExportAddresses() {
 		}
 
 		body, _ := json.Marshal(reqBody)
-		req := authRequest(http.MethodPost, "/api/v3/addresses/export", token, body)
+		req := authRequest(http.MethodPost, "/api/v3/addresses/export", s.token, body)
 		w := httptest.NewRecorder()
 
 		s.router.ServeHTTP(w, req)

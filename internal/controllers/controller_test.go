@@ -16,13 +16,11 @@ type ControllerTestSuite struct {
 	suite.Suite
 	app    application.Application
 	router *gin.Engine
+	token string
 }
 
-// func (s *ControllerTestSuite) SetupSuite() {
-
-// }
-
-func (s *ControllerTestSuite) SetupTest() {
+func (s *ControllerTestSuite) SetupSuite() {
+	// Set current environment as Test
 	gin.SetMode(gin.TestMode)
 
 	// Create test app
@@ -34,8 +32,14 @@ func (s *ControllerTestSuite) SetupTest() {
 	// Register routes
 	AddTestRoutes(s.router, s.app)
 
-	// Clean DB
+	// Cleanup before all test suite runs
 	s.cleanup()
+	s.token = s.loginAndGetToken("yash3@gmail.com")
+}
+
+func (s *ControllerTestSuite) SetupTest() {
+	// Clean DB
+	// s.cleanup()
 }
 
 func (s *ControllerTestSuite) TearDownSuite() {
