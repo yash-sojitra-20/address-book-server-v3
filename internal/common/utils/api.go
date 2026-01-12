@@ -37,7 +37,7 @@ type _RequestCtx struct {
 	GinCtx *gin.Context
 	IP     types.Ip
 	UserId *string
-	Email *string
+	Email  *string
 }
 
 func NewRequestCtx(
@@ -53,7 +53,7 @@ func NewRequestCtx(
 		GinCtx: ginCtx,
 		IP:     types.Ip(ip),
 		UserId: userId,
-		Email: email,
+		Email:  email,
 	}
 }
 
@@ -142,7 +142,7 @@ func HandleRequest[RQ any, RS any](application application.Application, handler 
 			}
 		}()
 
-		res = (func() mo.Result[*RS] {			
+		res = (func() mo.Result[*RS] {
 			reqCtx := NewRequestCtx(c)
 			req, err := payloadBuilder(application, reqCtx).Get()
 			if err != nil {
@@ -247,7 +247,10 @@ func HandleMiddleware(application application.Application, middlewareHandler Api
 					status := getStatusCode(err.ResponseErrType())
 					res := getErrorResponse(err, bundle)
 					c.AbortWithStatusJSON(status, res)
-					c.Request.Body.Close() // #nosec G104
+					// c.Request.Body.Close() // #nosec G104
+					if c.Request != nil && c.Request.Body != nil {
+						_ = c.Request.Body.Close()
+					}
 				} else {
 					c.Next()
 				}
@@ -357,7 +360,6 @@ func GetUserId(c *gin.Context) mo.Result[*string] {
 	}
 	return userIdResult
 }
-
 
 func GetEmail(c *gin.Context) mo.Result[*string] {
 	email := request.GetValueFromGinContext[string](c, "email")
