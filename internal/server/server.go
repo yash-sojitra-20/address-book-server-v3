@@ -11,6 +11,7 @@ import (
 	"time"
 
 	logmiddleware "bitbucket.org/vayana/walt-go/logger/middleware"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,15 +28,18 @@ func NewServer(application application.Application) *Server {
 
 func (server *Server) AddRoutes() *Server {
 	application := server.Application
-	routes.AddRoutes(server.router, application)
+	
+	// Add middleware BEFORE defining routes
+	server.router.Use(CORSMiddleware(nil))
 	server.router.Use(logmiddleware.GinMiddlewareLogger(server.GetLogger()))
+	
+	routes.AddRoutes(server.router, application)
 	return server
 }
 
 // Start starts the HTTP server.
 func (s *Server) Start() *http.Server {
-	s.router.Use(logmiddleware.GinMiddlewareLogger(s.GetLogger()))
-
+	// Logger middleware is now added in AddRoutes, so we don't need to add it here again.
 	server := &http.Server{
 		Addr:              ":" + fmt.Sprint(s.GetConfig().GetPort()),
 		Handler:           s.router,
@@ -49,4 +53,20 @@ func (s *Server) Start() *http.Server {
 	}()
 
 	return server
+}
+
+// CORSMiddleware configures CORS using gin-contrib/cors library
+func CORSMiddleware(allowedOrigins []string) gin.HandlerFunc {
+	if len(allowedOrigins) == 0 {
+		allowedOrigins = []string{"*"}
+	}
+
+	return cors.New(cors.Config{
+		AllowOrigins:     allowedOrigins,
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization", "Call-ID"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: false,
+		MaxAge:           12 * time.Hour,
+	})
 }
