@@ -21,3 +21,6 @@ bin/
 
 # CSV Export files
 **/exports/
+
+# Coverage file
+**/coverage.out
